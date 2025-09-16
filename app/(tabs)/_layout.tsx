@@ -1,8 +1,10 @@
-import { Ionicons } from "@expo/vector-icons";
+import TabBarIcon from "@/components/layout/TabBarIcon";
+import TabBarLabel from "@/components/layout/TabBarLabel";
 import { DefaultTheme } from "@react-navigation/native";
 import { Tabs } from "expo-router";
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { Platform } from "react-native";
 
 export default function TabLayout() {
   const { t } = useTranslation();
@@ -12,23 +14,32 @@ export default function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: DefaultTheme.colors.primary,
         headerShown: false,
+        tabBarStyle: Platform.select({
+          ios: {
+            paddingTop: 5,
+          },
+        }),
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          title: t("index.title"),
+          tabBarLabel: ({ color }) => (
+            <TabBarLabel label={t("index.title")} color={color} />
+          ),
           tabBarIcon: ({ color }) => (
-            <Ionicons name="qr-code" size={24} color={color} />
+            <TabBarIcon name="qr-code" color={color} />
           ),
         }}
       />
       <Tabs.Screen
         name="settings"
         options={{
-          title: t("settings.title"),
+          tabBarLabel: ({ color }) => (
+            <TabBarLabel label={t("settings.title")} color={color} />
+          ),
           tabBarIcon: ({ color }) => (
-            <Ionicons name="settings" size={24} color={color} />
+            <TabBarIcon name="settings" color={color} />
           ),
         }}
       />
