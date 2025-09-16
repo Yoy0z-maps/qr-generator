@@ -1,4 +1,5 @@
 // QRPreview.tsx (Expo)
+import { exportSvgQR } from "@/utils/exportAsSvg";
 import * as ImagePicker from "expo-image-picker";
 import * as MediaLibrary from "expo-media-library";
 import React, { useRef, useState } from "react";
@@ -8,11 +9,10 @@ import { captureRef } from "react-native-view-shot";
 
 type Props = {
   value: string; // URL or WIFI payload
-  fgColor: string; // 전경색
-  bgColor: string; // 배경색
+  fgColor: string;
 };
 
-export default function QRPreview({ value, fgColor, bgColor }: Props) {
+export default function QRPreview({ value, fgColor }: Props) {
   const shotRef = useRef<View>(null);
   const [logoUri, setLogoUri] = useState<string | undefined>(undefined);
 
@@ -43,14 +43,14 @@ export default function QRPreview({ value, fgColor, bgColor }: Props) {
       <View
         ref={shotRef}
         collapsable={false}
-        style={{ padding: 16, backgroundColor: bgColor }}
+        style={{ padding: 16, backgroundColor: "#ffffff" }}
       >
         {canRender ? (
           <QRCode
             value={safeValue}
             size={260}
             color={fgColor}
-            backgroundColor={bgColor}
+            backgroundColor={"#ffffff"}
             logo={logoUri}
             logoSize={56}
             logoBackgroundColor="transparent"
@@ -78,6 +78,10 @@ export default function QRPreview({ value, fgColor, bgColor }: Props) {
       {/* 광고 개방 로고는 별도 그리드로 보여주고, 잠금/광고 배지 표시 */}
       <View style={{ height: 8 }} />
       <Button title="갤러리에 저장(광고 후)" onPress={saveToGallery} />
+      <Button
+        title="SVG로 내보내기"
+        onPress={() => exportSvgQR({ value: safeValue, fg: fgColor })}
+      />
     </View>
   );
 }

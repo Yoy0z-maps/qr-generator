@@ -14,7 +14,7 @@ export default function Home() {
       <ScrollView>
         <SourcePicker onChangeValue={setValue} />
         <ColorPickerComponent color={fgColor} setColor={setFgColor} />
-        <QRPreview value={value} fgColor={fgColor} bgColor={"#ffffff"} />
+        <QRPreview value={value} fgColor={fgColor} />
       </ScrollView>
     </SafeAreaView>
   );
