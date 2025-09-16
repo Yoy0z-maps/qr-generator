@@ -1,0 +1,13 @@
+{
+  "index": {
+    "title": "主页"
+  },
+  "settings": {
+    "title": "设置",
+    "language": "语言",
+    "ko": "한국어",
+    "en": "English",
+    "ja": "日本語",
+    "zh": "简体中文"
+  }
+}
