@@ -50,7 +50,7 @@ export default function RootLayout() {
         const status = await mobileAds().initialize();
         console.log("status", status);
 
-        mobileAds().openAdInspector().catch(console.warn);
+        // mobileAds().openAdInspector().catch(console.warn);
         // 이제 광고 로드 가능
       });
   }, []);

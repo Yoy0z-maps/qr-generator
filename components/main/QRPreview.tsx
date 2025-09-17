@@ -1,5 +1,6 @@
 // QRPreview.tsx
 import PreviewShield from "@/components/main/PreviewShield";
+import { TEMPLATE_LOGOS } from "@/constants/logos";
 import { useRewarded } from "@/hooks/useRewards";
 import { exportSvgQR } from "@/utils/exportAsSvg";
 import * as ImagePicker from "expo-image-picker";
@@ -9,6 +10,7 @@ import { useTranslation } from "react-i18next";
 import { Alert, Button, Platform, Text, View } from "react-native";
 import QRCode from "react-native-qrcode-svg";
 import { captureRef } from "react-native-view-shot";
+import TemplateLogoPicker from "./TemplateLogoPicker";
 
 // const REWARDED_AD_UNIT_ID = Platform.select({
 //   ios: "ca-app-pub-3780332868290454/7529297071",
@@ -70,6 +72,17 @@ export default function QRPreview({
     Alert.alert("완료", "갤러리에 저장했어요.");
   }
 
+  // async function handlePickPremium(resolveUri: () => Promise<string>) {
+  //   try {
+  //     await showFor(async () => {
+  //       const uri = await resolveUri();
+  //       setLogoUri(uri);
+  //     });
+  //   } catch {
+  //     Alert.alert("광고 오류", "잠시 후 다시 시도해주세요.");
+  //   }
+  // }
+
   return (
     <View style={{ alignItems: "center", marginVertical: 20 }}>
       <View
@@ -117,6 +130,11 @@ export default function QRPreview({
       <View style={{ marginVertical: 15 }}>
         <Text style={{ color: "#666" }}>{t("index.protectPreview")}</Text>
       </View>
+      <TemplateLogoPicker
+        items={TEMPLATE_LOGOS}
+        onPick={(uri) => setLogoUri(uri)}
+        //  onPickPremium={(resolver) => handlePickPremium(resolver)}
+      />
       <Button title={t("index.selectMyLogo")} onPress={pickLogo} />
       <View style={{ height: 8 }} />
       <View style={{ flexDirection: "row", gap: 8 }}>
