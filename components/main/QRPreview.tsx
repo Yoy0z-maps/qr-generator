@@ -5,7 +5,8 @@ import { exportSvgQR } from "@/utils/exportAsSvg";
 import * as ImagePicker from "expo-image-picker";
 import * as MediaLibrary from "expo-media-library";
 import React, { useRef, useState } from "react";
-import { Alert, Button, Platform, View } from "react-native";
+import { useTranslation } from "react-i18next";
+import { Alert, Button, Platform, Text, View } from "react-native";
 import QRCode from "react-native-qrcode-svg";
 import { captureRef } from "react-native-view-shot";
 
@@ -28,10 +29,13 @@ export default function QRPreview({
   value: string;
   fgColor: string;
 }) {
+  const { t } = useTranslation();
   const shotRef = useRef<View>(null);
   const [logoUri, setLogoUri] = useState<string | undefined>(undefined);
   const [protect, setProtect] = useState(true); // 🔒 프리뷰 보호 ON
-  const { loaded, showFor } = useRewarded();
+  const { loaded, showFor } = useRewarded(
+    "ca-app-pub-3780332868290454/1794093971"
+  );
 
   const safeValue = String(value ?? "").trim();
   const canRender = safeValue.length > 0;
@@ -67,7 +71,7 @@ export default function QRPreview({
   }
 
   return (
-    <View style={{ alignItems: "center" }}>
+    <View style={{ alignItems: "center", marginVertical: 20 }}>
       <View
         ref={shotRef}
         collapsable={false}
@@ -104,32 +108,31 @@ export default function QRPreview({
               }}
             >
               <View style={{ opacity: 0.6 }}>
-                <Button title="내용을 입력하세요" onPress={() => {}} />
+                <Button title={t("index.inputValue")} onPress={() => {}} />
               </View>
             </View>
           )}
         </View>
       </View>
-
-      <View style={{ height: 12 }} />
-      <Button title="로고 선택(내 이미지)" onPress={pickLogo} />
+      <View style={{ marginVertical: 15 }}>
+        <Text style={{ color: "#666" }}>{t("index.protectPreview")}</Text>
+      </View>
+      <Button title={t("index.selectMyLogo")} onPress={pickLogo} />
       <View style={{ height: 8 }} />
-      <Button
-        title="갤러리에 저장(광고 후)"
-        disabled={!loaded}
-        onPress={() =>
-          showFor(saveToGallery).catch(() => Alert.alert("광고 오류"))
-        }
-      />
-      <Button
-        title="SVG로 내보내기"
-        disabled={!loaded}
-        onPress={() =>
-          showFor(() => exportSvgQR({ value: safeValue, fg: fgColor })).catch(
-            () => Alert.alert("광고 오류")
-          )
-        }
-      />
+      <View style={{ flexDirection: "row", gap: 8 }}>
+        <Button
+          title={t("index.saveToGallery")}
+          onPress={() => showFor(saveToGallery).catch(() => saveToGallery())}
+        />
+        <Button
+          title={t("index.exportAsSvg")}
+          onPress={() =>
+            showFor(() => exportSvgQR({ value: safeValue, fg: fgColor })).catch(
+              () => exportSvgQR({ value: safeValue, fg: fgColor })
+            )
+          }
+        />
+      </View>
     </View>
   );
 }

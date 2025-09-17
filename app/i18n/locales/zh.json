@@ -1,6 +1,18 @@
 {
   "index": {
-    "title": "主页"
+    "title": "主页",
+    "weblink": "网页链接",
+    "wifi": "Wi-Fi",
+    "color": "颜色",
+    "selectMyLogo": "选择我的logo",
+    "protectPreview": "QR捕获保护运行中 (观看广告后奖励)",
+    "saveToGallery": "保存到相册",
+    "exportAsSvg": "导出为SVG",
+    "inputValue": "请输入URL",
+    "password": "密码 (如果没有密码, 请留空)",
+    "hiddennet": "隐藏网络",
+    "yes": "是",
+    "no": "否"
   },
   "settings": {
     "title": "设置",

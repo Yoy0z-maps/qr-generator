@@ -1,6 +1,18 @@
 {
   "index": {
-    "title": "ホーム"
+    "title": "ホーム",
+    "weblink": "ウェブリンク",
+    "wifi": "Wi-Fi",
+    "color": "色変更",
+    "selectMyLogo": "カスタムロゴ",
+    "protectPreview": "QRキャプチャ保護運行中 (広告視聴後リワード)",
+    "saveToGallery": "ギャラリーに保存",
+    "exportAsSvg": "SVGでエクスポート",
+    "inputValue": "URLを入力してください",
+    "password": "パスワード (パスワードがない場合は空白)",
+    "hiddennet": "非表示ネットワーク",
+    "yes": "はい",
+    "no": "いいえ"
   },
   "settings": {
     "title": "設定",

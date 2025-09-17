@@ -1,6 +1,18 @@
 {
   "index": {
-    "title": "홈"
+    "title": "홈",
+    "weblink": "웹링크",
+    "wifi": "Wi-Fi",
+    "color": "색상변경",
+    "selectMyLogo": "커스텀 로고",
+    "protectPreview": "QR 캡처 보호 작동 중 (광고 시청 후 리워드)",
+    "saveToGallery": "갤러리에 저장하기",
+    "exportAsSvg": "SVG로 내보내기",
+    "inputValue": "URL을 입력하세요",
+    "password": "비밀번호 (비밀번호 없으면 공백)",
+    "hiddennet": "숨김 네트워크",
+    "yes": "예",
+    "no": "아니오"
   },
   "settings": {
     "title": "설정",

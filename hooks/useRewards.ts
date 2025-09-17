@@ -23,6 +23,10 @@ export function useRewarded(adUnitId?: string) {
   const rejectRef = useRef<null | ((e: unknown) => void)>(null);
 
   useEffect(() => {
+    console.log("[Rewarded] loaded", loaded);
+  }, [loaded]);
+
+  useEffect(() => {
     const s1 = rewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
       setLoaded(true);
       // console.log("[Rewarded] LOADED");

@@ -1,6 +1,18 @@
 {
   "index": {
-    "title": "Home"
+    "title": "Home",
+    "weblink": "Web Link",
+    "wifi": "Wi-Fi",
+    "color": "Color",
+    "selectMyLogo": "Select My Logo",
+    "protectPreview": "QR Capture Protection Running (Reward after watching ad)",
+    "saveToGallery": "Save to Gallery",
+    "exportAsSvg": "Export as SVG",
+    "inputValue": "Please enter the URL",
+    "password": "Password (if no password, leave blank)",
+    "hiddennet": "Hidden Network",
+    "yes": "Yes",
+    "no": "No"
   },
   "settings": {
     "title": "Settings",

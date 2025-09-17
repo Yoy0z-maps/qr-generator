@@ -12,6 +12,7 @@ import ColorPicker, {
 } from "reanimated-color-picker";
 
 import { colorPickerStyle } from "@/styles/colorPickerStyle";
+import { useTranslation } from "react-i18next";
 import BaseContainer from "./BaseContainer";
 import Divider from "./Divider";
 
@@ -26,7 +27,7 @@ export default function ColorPickerComponent({
   setColor: (color: string) => void;
 }) {
   const currentColor = useSharedValue(initialColor);
-
+  const { t } = useTranslation();
   // runs on the ui thread on color change
   const onColorChange = (color: ColorFormatsObject) => {
     "worklet";
@@ -38,7 +39,7 @@ export default function ColorPickerComponent({
   };
 
   return (
-    <BaseContainer name="Panel2 Saturation" backgroundColor={currentColor}>
+    <BaseContainer name={t("index.color")} backgroundColor={currentColor}>
       <KeyboardAvoidingView behavior="position">
         <View style={colorPickerStyle.pickerContainer}>
           <ColorPicker

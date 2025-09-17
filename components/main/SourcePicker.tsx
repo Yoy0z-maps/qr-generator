@@ -1,6 +1,7 @@
 // SourcePicker.tsx
 import { buildWifiPayload } from "@/utils/wifiQRFormat"; // 네 util
 import React, { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Pressable, Text, TextInput, View } from "react-native";
 
 type Props = {
@@ -9,6 +10,7 @@ type Props = {
 
 type Mode = "url" | "wifi";
 export default function SourcePicker({ onChangeValue }: Props) {
+  const { t } = useTranslation();
   const [mode, setMode] = useState<Mode>("url");
   const [url, setUrl] = useState("");
   const [ssid, setSsid] = useState("");
@@ -27,7 +29,7 @@ export default function SourcePicker({ onChangeValue }: Props) {
   }, [value]);
 
   return (
-    <View style={{ gap: 8 }}>
+    <View style={{ gap: 8, marginBottom: 20, paddingHorizontal: 50 }}>
       {/* 아주 심플한 토글 */}
       <View style={{ flexDirection: "row", gap: 8 }}>
         {(["url", "wifi"] as const).map((m) => (
@@ -44,7 +46,7 @@ export default function SourcePicker({ onChangeValue }: Props) {
             <Text
               style={{ color: mode === m ? "#fff" : "#333", fontWeight: "600" }}
             >
-              {m === "url" ? "웹 링크" : "Wi-Fi"}
+              {m === "url" ? t("index.weblink") : t("index.wifi")}
             </Text>
           </Pressable>
         ))}
@@ -79,7 +81,7 @@ export default function SourcePicker({ onChangeValue }: Props) {
             }}
           />
           <TextInput
-            placeholder="패스워드(무암호면 비워두기)"
+            placeholder={t("index.password")}
             value={password}
             onChangeText={setPassword}
             secureTextEntry={security !== "nopass"}
@@ -109,7 +111,9 @@ export default function SourcePicker({ onChangeValue }: Props) {
             ))}
           </View>
           <Pressable onPress={() => setHidden((v) => !v)}>
-            <Text>숨김 네트워크: {hidden ? "예" : "아니오"}</Text>
+            <Text>
+              {t("index.hiddennet")}: {hidden ? t("index.yes") : t("index.no")}
+            </Text>
           </Pressable>
         </View>
       )}
