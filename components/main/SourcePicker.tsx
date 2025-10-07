@@ -7,11 +7,11 @@ import URLWiFiToggleButton from "./URLWiFiToggleButton";
 
 type Props = {
   onChangeValue: (v: string) => void;
-  reset?: boolean; // 초기화 신호
+  resetTrigger?: number; // 초기화 신호
 };
 
 type Mode = "url" | "wifi";
-export default function SourcePicker({ onChangeValue, reset = false }: Props) {
+export default function SourcePicker({ onChangeValue, resetTrigger }: Props) {
   const [mode, setMode] = useState<Mode>("url");
   const [url, setUrl] = useState("");
   const [wifi, setWifi] = useState<{
@@ -28,7 +28,7 @@ export default function SourcePicker({ onChangeValue, reset = false }: Props) {
 
   // 트리거를 통한 초기화
   useEffect(() => {
-    if (reset) {
+    if (resetTrigger) {
       setUrl("");
       setWifi({
         ssid: "",
@@ -37,7 +37,7 @@ export default function SourcePicker({ onChangeValue, reset = false }: Props) {
         hidden: false,
       });
     }
-  }, [reset]);
+  }, [resetTrigger]);
 
   const value = useMemo(() => {
     if (mode === "url") return url.trim();
@@ -58,7 +58,7 @@ export default function SourcePicker({ onChangeValue, reset = false }: Props) {
       style={{
         gap: 8,
         marginBottom: 20,
-        paddingHorizontal: 50,
+        paddingHorizontal: 48,
         flexDirection: "column",
         alignItems: "center",
       }}

@@ -39,7 +39,7 @@ export default function ColorPickerComponent({
   };
 
   return (
-    <BaseContainer name={t("index.color")} backgroundColor={currentColor}>
+    <BaseContainer name={t("index.solid")} backgroundColor={currentColor}>
       <KeyboardAvoidingView behavior="position">
         <View style={colorPickerStyle.pickerContainer}>
           <ColorPicker

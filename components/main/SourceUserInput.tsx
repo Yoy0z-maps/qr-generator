@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 10,
     borderRadius: 8,
-    width: "33.33%",
+    flex: 1,
   },
   wifiTypeButtonText: {
     textAlign: "center",

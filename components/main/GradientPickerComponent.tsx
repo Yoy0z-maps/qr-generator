@@ -25,12 +25,7 @@ import ColorPicker, {
 } from "reanimated-color-picker";
 
 import { colorPickerStyle } from "@/styles/colorPickerStyle";
-import {
-  Gradient,
-  GRADIENT_PRESETS,
-  LinearGradient as LinearGradientType,
-  RadialGradient as RadialGradientType,
-} from "@/types/gradient";
+import { Gradient, GRADIENT_PRESETS } from "@/types/gradient";
 import BaseContainer from "./BaseContainer";
 import Divider from "./Divider";
 
@@ -45,10 +40,6 @@ export default function GradientPickerComponent({
   gradient,
   setGradient,
 }: GradientPickerComponentProps) {
-  const [isCustomizing, setIsCustomizing] = useState(false);
-  const [customGradient, setCustomGradient] = useState<Gradient | null>(
-    gradient
-  );
   const [editingStopIndex, setEditingStopIndex] = useState(0);
   const { t } = useTranslation();
 
@@ -60,67 +51,24 @@ export default function GradientPickerComponent({
   };
 
   const onColorPick = (color: ColorFormatsObject) => {
-    if (customGradient && editingStopIndex >= 0) {
-      const newStops = [...customGradient.stops];
+    if (gradient && editingStopIndex >= 0) {
+      const newStops = [...gradient.stops];
       newStops[editingStopIndex] = {
         ...newStops[editingStopIndex],
         color: color.hex,
       };
 
       const newGradient: Gradient = {
-        ...customGradient,
+        ...gradient,
         stops: newStops,
       };
 
-      setCustomGradient(newGradient);
+      setGradient(newGradient);
     }
   };
 
   const handlePresetSelect = (preset: Gradient) => {
     setGradient(preset);
-    setIsCustomizing(false);
-  };
-
-  const handleCustomize = () => {
-    if (gradient) {
-      setCustomGradient(gradient);
-    }
-    setIsCustomizing(true);
-  };
-
-  const handleApplyCustom = () => {
-    if (customGradient) {
-      setGradient(customGradient);
-      setIsCustomizing(false);
-    }
-  };
-
-  const handleRemoveGradient = () => {
-    setGradient(null);
-    setIsCustomizing(false);
-  };
-
-  // 오류 1, 2, 3 수정: gradient type 변경 시 올바른 타입으로 변환
-  const handleTypeChange = (newType: "linear" | "radial") => {
-    if (!customGradient) return;
-
-    if (newType === "linear") {
-      const linearGradient: LinearGradientType = {
-        type: "linear",
-        direction: "to-right",
-        stops: customGradient.stops,
-      };
-      setCustomGradient(linearGradient);
-    } else {
-      const radialGradient: RadialGradientType = {
-        type: "radial",
-        centerX: 50,
-        centerY: 50,
-        radius: 70,
-        stops: customGradient.stops,
-      };
-      setCustomGradient(radialGradient);
-    }
   };
 
   const renderGradientPreview = (
@@ -178,50 +126,43 @@ export default function GradientPickerComponent({
 
   const backgroundColor = useSharedValue<string>("#f0f0f0");
 
-  if (isCustomizing && customGradient) {
-    return (
-      <BaseContainer
-        name={t("index.gradientCustomize")}
-        backgroundColor={backgroundColor}
-      >
-        <View style={styles.customizeContainer}>
-          {/* Gradient Type Selection */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Gradient Type</Text>
-            <View style={styles.buttonRow}>
-              <TouchableOpacity
-                style={[
-                  styles.typeButton,
-                  customGradient.type === "linear" && styles.activeButton,
-                ]}
-                onPress={() => handleTypeChange("linear")}
-              >
-                <Text style={styles.buttonText}>Linear</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.typeButton,
-                  customGradient.type === "radial" && styles.activeButton,
-                ]}
-                onPress={() => handleTypeChange("radial")}
-              >
-                <Text style={styles.buttonText}>Radial</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          {/* Gradient Preview */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Preview</Text>
+  return (
+    <BaseContainer name={t("index.gradient")} backgroundColor={backgroundColor}>
+      <ScrollView style={styles.container}>
+        {/* Gradient Type Selection with Preview */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Gradient Preview</Text>
+          {/* Preview integrated with type selection */}
+          {gradient && (
             <View style={styles.previewContainer}>
-              {renderGradientPreview(customGradient, 120)}
+              {renderGradientPreview(gradient, 120)}
             </View>
-          </View>
+          )}
+        </View>
 
-          {/* Color Stops */}
+        {/* Gradient Presets */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Presets</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <View style={styles.presetsContainer}>
+              {GRADIENT_PRESETS.map((preset, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={styles.presetItem}
+                  onPress={() => handlePresetSelect(preset)}
+                >
+                  {renderGradientPreview(preset)}
+                </TouchableOpacity>
+              ))}
+            </View>
+          </ScrollView>
+        </View>
+
+        {/* Color Stops - only show when gradient exists */}
+        {gradient && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Color Stops</Text>
-            {customGradient.stops.map((stop, index) => (
+            {gradient.stops.map((stop, index) => (
               <TouchableOpacity
                 key={index}
                 style={[
@@ -241,14 +182,16 @@ export default function GradientPickerComponent({
               </TouchableOpacity>
             ))}
           </View>
+        )}
 
-          {/* Color Picker for Selected Stop */}
+        {/* Color Picker for Selected Stop - only show when gradient exists */}
+        {gradient && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>
               Edit Stop {editingStopIndex + 1}
             </Text>
             <ColorPicker
-              value={customGradient.stops[editingStopIndex]?.color || "#000000"}
+              value={gradient.stops[editingStopIndex]?.color || "#000000"}
               sliderThickness={25}
               thumbSize={30}
               thumbShape="rect"
@@ -270,89 +213,16 @@ export default function GradientPickerComponent({
               />
             </ColorPicker>
           </View>
-
-          {/* Action Buttons */}
-          <View style={styles.actionButtons}>
-            <TouchableOpacity
-              style={[styles.actionButton, styles.applyButton]}
-              onPress={handleApplyCustom}
-            >
-              <Text style={styles.actionButtonText}>Apply</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.actionButton, styles.cancelButton]}
-              onPress={() => setIsCustomizing(false)}
-            >
-              <Text style={styles.actionButtonText}>Cancel</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </BaseContainer>
-    );
-  }
-
-  return (
-    <BaseContainer name={t("index.gradient")} backgroundColor={backgroundColor}>
-      <View style={styles.container}>
-        {/* Current Gradient Display */}
-        {gradient && (
-          <View style={styles.currentGradientContainer}>
-            <Text style={styles.sectionTitle}>Current Gradient</Text>
-            <View style={styles.currentGradientPreview}>
-              {renderGradientPreview(gradient, 80)}
-              <TouchableOpacity
-                style={styles.removeButton}
-                onPress={handleRemoveGradient}
-              >
-                <Text style={styles.removeButtonText}>✕</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
         )}
-
-        {/* Gradient Presets */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Presets</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <View style={styles.presetsContainer}>
-              {GRADIENT_PRESETS.map((preset, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={styles.presetItem}
-                  onPress={() => handlePresetSelect(preset)}
-                >
-                  {renderGradientPreview(preset)}
-                </TouchableOpacity>
-              ))}
-            </View>
-          </ScrollView>
-        </View>
-
-        {/* Action Buttons */}
-        <View style={styles.actionButtons}>
-          <TouchableOpacity
-            style={[styles.actionButton, styles.customizeButton]}
-            onPress={handleCustomize}
-            disabled={!gradient}
-          >
-            <Text
-              style={[
-                styles.actionButtonText,
-                !gradient && styles.disabledButtonText,
-              ]}
-            >
-              Customize
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+      </ScrollView>
     </BaseContainer>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
+    paddingTop: 100,
+    paddingHorizontal: 12,
   },
   section: {
     marginBottom: 20,
@@ -395,7 +265,8 @@ const styles = StyleSheet.create({
     padding: 2,
   },
   customizeContainer: {
-    padding: 16,
+    paddingTop: 100,
+    paddingHorizontal: 12,
   },
   buttonRow: {
     flexDirection: "row",

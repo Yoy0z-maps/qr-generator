@@ -104,7 +104,7 @@ export default function QRPreview({
   // }
 
   return (
-    <View style={{ alignItems: "center", marginVertical: 20 }}>
+    <View style={{ alignItems: "center", marginBottom: 20 }}>
       <View
         ref={shotRef}
         collapsable={false}

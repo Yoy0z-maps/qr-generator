@@ -1,25 +1,19 @@
 import ColorPickerComponent from "@/components/main/ColorPickerComponent";
 import GradientPickerComponent from "@/components/main/GradientPickerComponent";
 import QRPreview from "@/components/main/QRPreview";
+import ResetButton from "@/components/main/ResetButton";
 import SourcePicker from "@/components/main/SourcePicker";
 import { Gradient } from "@/types/gradient";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import {
-  Alert,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Alert, ScrollView, View } from "react-native";
 
 export default function Home() {
   const [value, setValue] = useState("");
   const [fgColor, setFgColor] = useState("#000000");
   const [gradient, setGradient] = useState<Gradient | null>(null);
   const [logoUri, setLogoUri] = useState<string | undefined>(undefined);
-  const [resetTrigger, setResetTrigger] = useState(0); // 초기화 트리거
+  const [resetTrigger, setResetTrigger] = useState<number>(0); // 초기화 트리거
   const { t } = useTranslation();
 
   const handleReset = () => {
@@ -44,17 +38,11 @@ export default function Home() {
 
   return (
     <ScrollView>
-      <SourcePicker onChangeValue={setValue} reset={resetTrigger > 0} />
+      <SourcePicker onChangeValue={setValue} resetTrigger={resetTrigger} />
       <ColorPickerComponent color={fgColor} setColor={setFgColor} />
+      <View style={{ height: 12 }} />
       <GradientPickerComponent gradient={gradient} setGradient={setGradient} />
-
-      {/* Reset Button */}
-      <View style={styles.resetContainer}>
-        <TouchableOpacity style={styles.resetButton} onPress={handleReset}>
-          <Text style={styles.resetButtonText}>{t("index.resetAll")}</Text>
-        </TouchableOpacity>
-      </View>
-
+      <ResetButton handleReset={handleReset} />
       <QRPreview
         value={value}
         fgColor={fgColor}
@@ -65,21 +53,3 @@ export default function Home() {
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  resetContainer: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-  },
-  resetButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  resetButtonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-});
