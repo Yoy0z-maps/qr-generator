@@ -1,7 +1,9 @@
 // QRPreview.tsx
+import GradientQRCode from "@/components/main/GradientQRCode";
 import PreviewShield from "@/components/main/PreviewShield";
 import { TEMPLATE_LOGOS } from "@/constants/logos";
 import { useRewarded } from "@/hooks/useRewards";
+import { Gradient } from "@/types/gradient";
 import { exportSvgQR } from "@/utils/exportAsSvg";
 import * as ImagePicker from "expo-image-picker";
 import * as MediaLibrary from "expo-media-library";
@@ -18,7 +20,7 @@ import TemplateLogoPicker from "./TemplateLogoPicker";
 // });
 
 const REWARDED_AD_UNIT_ID = Platform.select({
-  ios: "ca-app-pub-3780332868290454/1794093971",
+  ios: "ca-app-pub-3780332868290454/7529297071",
   android: "ca-app-pub-3780332868290454/1482763472",
 });
 
@@ -27,13 +29,18 @@ const QR_SIZE = 260;
 export default function QRPreview({
   value,
   fgColor,
+  gradient,
+  logoUri,
+  setLogoUri,
 }: {
   value: string;
   fgColor: string;
+  gradient?: Gradient | null;
+  logoUri?: string;
+  setLogoUri: (uri: string | undefined) => void;
 }) {
   const { t } = useTranslation();
   const shotRef = useRef<View>(null);
-  const [logoUri, setLogoUri] = useState<string | undefined>(undefined);
   const [protect, setProtect] = useState(true); // 🔒 프리뷰 보호 ON
   const { loaded, showFor } = useRewarded(
     "ca-app-pub-3780332868290454/1794093971"
@@ -72,6 +79,19 @@ export default function QRPreview({
     Alert.alert("완료", "갤러리에 저장했어요.");
   }
 
+  async function exportSvg() {
+    try {
+      await exportSvgQR({
+        value: safeValue,
+        fg: fgColor,
+        gradient: gradient,
+        logoDataUri: logoUri,
+      });
+    } catch (error) {
+      Alert.alert("Export Error", "Failed to export SVG");
+    }
+  }
+
   // async function handlePickPremium(resolveUri: () => Promise<string>) {
   //   try {
   //     await showFor(async () => {
@@ -93,16 +113,26 @@ export default function QRPreview({
         <View style={{ width: QR_SIZE, height: QR_SIZE }}>
           {canRender ? (
             <>
-              <QRCode
-                value={safeValue}
-                size={QR_SIZE}
-                color={fgColor}
-                backgroundColor={"#ffffff"}
-                logo={logoUri}
-                logoSize={56}
-                logoBackgroundColor="transparent"
-                ecl="H"
-              />
+              {gradient ? (
+                <GradientQRCode
+                  value={safeValue}
+                  size={QR_SIZE}
+                  backgroundColor="#ffffff"
+                  gradient={gradient}
+                  logoUri={logoUri}
+                />
+              ) : (
+                <QRCode
+                  value={safeValue}
+                  size={QR_SIZE}
+                  color={fgColor}
+                  backgroundColor={"#ffffff"}
+                  logo={logoUri}
+                  logoSize={56}
+                  logoBackgroundColor="transparent"
+                  ecl="H"
+                />
+              )}
               {/* 🔒 프리뷰 보호 오버레이 */}
               <PreviewShield
                 width={QR_SIZE}
@@ -136,7 +166,6 @@ export default function QRPreview({
         //  onPickPremium={(resolver) => handlePickPremium(resolver)}
       />
       <Button title={t("index.selectMyLogo")} onPress={pickLogo} />
-      <View style={{ height: 8 }} />
       <View style={{ flexDirection: "row", gap: 8 }}>
         <Button
           title={t("index.saveToGallery")}
@@ -144,11 +173,7 @@ export default function QRPreview({
         />
         <Button
           title={t("index.exportAsSvg")}
-          onPress={() =>
-            showFor(() => exportSvgQR({ value: safeValue, fg: fgColor })).catch(
-              () => exportSvgQR({ value: safeValue, fg: fgColor })
-            )
-          }
+          onPress={() => showFor(exportSvg).catch(() => exportSvg())}
         />
       </View>
     </View>

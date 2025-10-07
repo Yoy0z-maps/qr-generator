@@ -1,3 +1,4 @@
+import { Gradient } from "@/types/gradient";
 import * as Legacy from "expo-file-system/legacy";
 import * as Sharing from "expo-sharing";
 import QR from "qrcode-generator";
@@ -15,10 +16,40 @@ function buildQRMatrix(value: string, ecc: ECC = "H") {
   };
 }
 
+function generateGradientDef(gradient: Gradient): string {
+  const gradientId = `gradient-${gradient.type}-${Date.now()}`;
+
+  if (gradient.type === "linear") {
+    const { direction } = gradient;
+    const x1 = direction.includes("left") ? "100%" : "0%";
+    const y1 = direction.includes("top") ? "100%" : "0%";
+    const x2 = direction.includes("right") ? "100%" : "0%";
+    const y2 = direction.includes("bottom") ? "100%" : "0%";
+
+    const stops = gradient.stops
+      .map(
+        (stop) => `<stop offset="${stop.offset}%" stop-color="${stop.color}" />`
+      )
+      .join("");
+
+    return `<linearGradient id="${gradientId}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}">${stops}</linearGradient>`;
+  } else {
+    const { centerX, centerY, radius } = gradient;
+    const stops = gradient.stops
+      .map(
+        (stop) => `<stop offset="${stop.offset}%" stop-color="${stop.color}" />`
+      )
+      .join("");
+
+    return `<radialGradient id="${gradientId}" cx="${centerX}%" cy="${centerY}%" r="${radius}%">${stops}</radialGradient>`;
+  }
+}
+
 export async function exportSvgQR(opts: {
   value: string;
   fg?: string;
   bg?: string;
+  gradient?: Gradient | null;
   moduleSize?: number; // 한 모듈(px) 크기 (기본 10)
   quietZone?: number; // 여백(모듈 수) 기본 4
   logoDataUri?: string; // 중앙 로고 data URI (선택)
@@ -28,6 +59,7 @@ export async function exportSvgQR(opts: {
     value,
     fg = "#000000",
     bg = "#ffffff",
+    gradient,
     moduleSize = 10,
     quietZone = 4,
     logoDataUri,
@@ -59,14 +91,28 @@ export async function exportSvgQR(opts: {
     logo = `<image href="${logoDataUri}" x="${lx}" y="${ly}" width="${ls}" height="${ls}" />`;
   }
 
+  // Generate gradient definition if gradient is provided
+  let gradientDef = "";
+  let fillValue = fg;
+
+  if (gradient) {
+    gradientDef = generateGradientDef(gradient);
+    const gradientId = gradientDef.match(/id="([^"]+)"/)?.[1] || "gradient";
+    fillValue = `url(#${gradientId})`;
+  }
+
   const svg = `
 <svg xmlns="http://www.w3.org/2000/svg" width="${full}" height="${full}" viewBox="0 0 ${full} ${full}">
+  <defs>
+    ${gradientDef}
+  </defs>
   <rect width="100%" height="100%" fill="${bg}"/>
-  <g fill="${fg}">
+  <g fill="${fillValue}">
     ${rects}
   </g>
   ${logo}
 </svg>`.trim();
+
   console.log("svg", svg);
 
   const baseDir = Legacy.cacheDirectory!;

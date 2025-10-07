@@ -1,15 +1,16 @@
 // SourcePicker.tsx
 import { buildWifiPayload } from "@/utils/wifiQRFormat"; // 네 util
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, Text, TextInput, View } from "react-native";
 
 type Props = {
   onChangeValue: (v: string) => void;
+  reset?: boolean; // 초기화 신호
 };
 
 type Mode = "url" | "wifi";
-export default function SourcePicker({ onChangeValue }: Props) {
+export default function SourcePicker({ onChangeValue, reset = false }: Props) {
   const { t } = useTranslation();
   const [mode, setMode] = useState<Mode>("url");
   const [url, setUrl] = useState("");
@@ -17,6 +18,17 @@ export default function SourcePicker({ onChangeValue }: Props) {
   const [password, setPassword] = useState("");
   const [security, setSecurity] = useState<"WPA" | "WEP" | "nopass">("WPA");
   const [hidden, setHidden] = useState(false);
+
+  // 초기화 신호를 받으면 모든 상태 초기화
+  useEffect(() => {
+    if (reset) {
+      setUrl("");
+      setSsid("");
+      setPassword("");
+      setSecurity("WPA");
+      setHidden(false);
+    }
+  }, [reset]);
 
   const value = useMemo(() => {
     if (mode === "url") return url.trim();
@@ -26,7 +38,7 @@ export default function SourcePicker({ onChangeValue }: Props) {
   // 부모로 최신 값 전달
   React.useEffect(() => {
     onChangeValue(value);
-  }, [value]);
+  }, [value, onChangeValue]);
 
   return (
     <View style={{ gap: 8, marginBottom: 20, paddingHorizontal: 50 }}>
