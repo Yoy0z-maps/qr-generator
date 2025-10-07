@@ -16,10 +16,12 @@
     "saveToGallery": "ギャラリーに保存",
     "exportAsSvg": "SVGでエクスポート",
     "inputValue": "URLを入力してください",
+    "ssid": "SSID (無線LAN名)",
     "password": "パスワード (パスワードがない場合は空白)",
     "hiddennet": "非表示ネットワーク",
     "yes": "はい",
-    "no": "いいえ"
+    "no": "いいえ",
+    "wifiType": "WPA, WEP, nopassは何ですか？"
   },
   "settings": {
     "title": "設定",

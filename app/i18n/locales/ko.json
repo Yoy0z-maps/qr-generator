@@ -6,7 +6,7 @@
     "color": "색상변경",
     "gradient": "그라디언트",
     "gradientCustomize": "그라디언트 커스터마이징",
-    "resetAll": "모든 설정 초기화",
+    "resetAll": "설정 초기화",
     "resetTitle": "설정 초기화",
     "resetMessage": "모든 설정을 초기화하시겠습니까?",
     "reset": "초기화",
@@ -16,10 +16,12 @@
     "saveToGallery": "갤러리에 저장하기",
     "exportAsSvg": "SVG로 내보내기",
     "inputValue": "URL을 입력하세요",
+    "ssid": "SSID (무선랜 이름)",
     "password": "비밀번호 (비밀번호 없으면 공백)",
     "hiddennet": "숨김 네트워크",
     "yes": "예",
-    "no": "아니오"
+    "no": "아니오",
+    "wifiType": "WPA, WEP, nopass가 무엇인가요?"
   },
   "settings": {
     "title": "설정",

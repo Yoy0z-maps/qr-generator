@@ -16,10 +16,12 @@
     "saveToGallery": "Save to Gallery",
     "exportAsSvg": "Export as SVG",
     "inputValue": "Please enter the URL",
+    "ssid": "SSID (Wi-Fi Name)",
     "password": "Password (if no password, leave blank)",
     "hiddennet": "Hidden Network",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "wifiType": "What is WPA, WEP, nopass?"
   },
   "settings": {
     "title": "Settings",

@@ -16,10 +16,12 @@
     "saveToGallery": "保存到相册",
     "exportAsSvg": "导出为SVG",
     "inputValue": "请输入URL",
+    "ssid": "SSID (Wi-Fi名称)",
     "password": "密码 (如果没有密码, 请留空)",
     "hiddennet": "隐藏网络",
     "yes": "是",
-    "no": "否"
+    "no": "否",
+    "wifiType": "WPA, WEP, nopass是什么？"
   },
   "settings": {
     "title": "设置",
