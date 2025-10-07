@@ -21,7 +21,14 @@
     "hiddennet": "非表示ネットワーク",
     "yes": "はい",
     "no": "いいえ",
-    "wifiType": "WPA, WEP, nopassは何ですか？"
+    "wifiType": "WPA, WEP, nopassは何ですか？",
+    "wifiTypeModal": {
+      "title": "何を選ぶ必要がありますか？",
+      "wpa": "• WPA: 最新のWiFi (推奨)",
+      "wep": "• WEP: 古いWiFi (セキュリティ脆弱性)",
+      "nopass": "• nopass: パスワードなしの公開WiFi",
+      "close": "確定"
+    }
   },
   "settings": {
     "title": "設定",

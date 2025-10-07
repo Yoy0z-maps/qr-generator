@@ -21,7 +21,14 @@
     "hiddennet": "Hidden Network",
     "yes": "Yes",
     "no": "No",
-    "wifiType": "What is WPA, WEP, nopass?"
+    "wifiType": "What is WPA, WEP, nopass?",
+    "wifiTypeModal": {
+      "title": "What do you need to choose?",
+      "wpa": "• WPA: Most recent WiFi (Recommended)",
+      "wep": "• WEP: Old WiFi (Security Vulnerability)",
+      "nopass": "• nopass: Public WiFi without password",
+      "close": "Confirm"
+    }
   },
   "settings": {
     "title": "Settings",

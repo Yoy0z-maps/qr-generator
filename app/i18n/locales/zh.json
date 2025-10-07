@@ -21,7 +21,14 @@
     "hiddennet": "隐藏网络",
     "yes": "是",
     "no": "否",
-    "wifiType": "WPA, WEP, nopass是什么？"
+    "wifiType": "WPA, WEP, nopass是什么？",
+    "wifiTypeModal": {
+      "title": "选择什么？",
+      "wpa": "• WPA: 大多数最新的WiFi (推荐)",
+      "wep": "• WEP: 旧的WiFi (安全漏洞)",
+      "nopass": "• nopass: 无密码的公共WiFi",
+      "close": "确定"
+    }
   },
   "settings": {
     "title": "设置",

@@ -21,7 +21,14 @@
     "hiddennet": "숨김 네트워크",
     "yes": "예",
     "no": "아니오",
-    "wifiType": "WPA, WEP, nopass가 무엇인가요?"
+    "wifiType": "WPA, WEP, nopass가 무엇인가요?",
+    "wifiTypeModal": {
+      "title": "무엇을 선택해야 하나요?",
+      "wpa": "• WPA: 대부분의 최신 WiFi (권장)",
+      "wep": "• WEP: 오래된 WiFi (보안 취약)",
+      "nopass": "• nopass: 비밀번호 없는 공개 WiFi",
+      "close": "확인"
+    }
   },
   "settings": {
     "title": "설정",

@@ -1,7 +1,9 @@
 import { AntDesign } from "@expo/vector-icons";
 import { DefaultTheme } from "@react-navigation/native";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import WiFiTypeInfoModal from "./WiFiTypeInfoModal";
 
 type Props = {
   mode: "url" | "wifi";
@@ -29,6 +31,7 @@ export default function SourceUserInput({
   setWifi,
 }: Props) {
   const { t } = useTranslation();
+  const [modalOpen, setModalOpen] = useState(false);
 
   if (mode === "url") {
     return (
@@ -83,7 +86,10 @@ export default function SourceUserInput({
           </Pressable>
         ))}
       </View>
-      <Pressable style={styles.wifiTypeInfoContainer}>
+      <Pressable
+        style={styles.wifiTypeInfoContainer}
+        onPress={() => setModalOpen(true)}
+      >
         <AntDesign name="question-circle" size={12} color="#767676" />
         <Text style={styles.wifiTypeInfoText}>{t("index.wifiType")}</Text>
       </Pressable>
@@ -92,6 +98,7 @@ export default function SourceUserInput({
           {t("index.hiddennet")}: {wifi.hidden ? t("index.yes") : t("index.no")}
         </Text>
       </Pressable> */}
+      <WiFiTypeInfoModal modalOpen={modalOpen} setModalOpen={setModalOpen} />
     </View>
   );
 }
