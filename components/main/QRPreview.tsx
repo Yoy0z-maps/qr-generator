@@ -12,6 +12,7 @@ import {
 import { colors, radius, spacing } from "@/constants/theme";
 import { HistoryDraft, useHistory } from "@/context/HistoryContext";
 import { useQREditor } from "@/context/QREditorContext";
+import { useLayoutMode } from "@/hooks/useLayoutMode";
 import { useRewarded } from "@/hooks/useRewards";
 import { QRStyle } from "@/types/qr";
 import { getScanWarnings } from "@/utils/colorContrast";
@@ -36,14 +37,14 @@ import {
   Pressable,
   StyleSheet,
   Text,
-  useWindowDimensions,
   View,
 } from "react-native";
 import Svg from "react-native-svg";
 import { captureRef } from "react-native-view-shot";
 
 const CAPTURE_PADDING = 12;
-const MAX_QR_SIZE = 260;
+/** 미리보기 QR 최대 크기: 좁은 창(iPhone) / 넓은 창(iPad·Mac) */
+const MAX_QR_SIZE = { compact: 260, regular: 380 };
 const ALBUM_NAME = "QR Codes";
 const PNG_RESOLUTIONS = ["1024", "2048"] as const;
 type PngResolution = (typeof PNG_RESOLUTIONS)[number];
@@ -142,7 +143,9 @@ export default function QRPreview() {
   const { t } = useTranslation();
   const { value, mode, forms, style, logo } = useQREditor();
   const history = useHistory();
-  const { width: windowWidth } = useWindowDimensions();
+  const { width: windowWidth, isRegular } = useLayoutMode();
+  // 미리보기 영역의 실제 너비 (2단 레이아웃·분할 화면·창 크기 변경에 맞춰 QR 크기 조절)
+  const [stageWidth, setStageWidth] = useState(0);
 
   const exportSvgRef = useRef<Svg>(null);
   const shotRef = useRef<View>(null);
@@ -155,10 +158,14 @@ export default function QRPreview() {
   const { enabled: rewardedEnabled, waitUntilLoaded, show } =
     useRewarded(REWARDED_AD_UNIT_ID);
 
-  // 화면 패딩(16) + 카드 패딩(16) + 캡처 여백을 뺀 크기
-  const qrSize = Math.min(
-    MAX_QR_SIZE,
-    windowWidth - spacing.lg * 4 - CAPTURE_PADDING * 2
+  // 첫 레이아웃 전에는 한 열 기준(화면 패딩 + 카드 패딩)으로 추정
+  const availableWidth =
+    (stageWidth || windowWidth - spacing.lg * 4) - CAPTURE_PADDING * 2;
+  const qrSize = Math.max(
+    120,
+    Math.floor(
+      Math.min(isRegular ? MAX_QR_SIZE.regular : MAX_QR_SIZE.compact, availableWidth)
+    )
   );
 
   // 타이핑 중에는 입력 반응을 우선하고, QR 렌더는 여유가 생길 때 최신 값으로 갱신
@@ -338,7 +345,10 @@ export default function QRPreview() {
         </Pressable>
       }
     >
-      <View style={styles.stage}>
+      <View
+        style={styles.stage}
+        onLayout={(e) => setStageWidth(e.nativeEvent.layout.width)}
+      >
         <View style={[styles.frame, { width: frameSize, height: frameSize }]}>
           {/* 투명 배경 표시용 체크무늬 (캡처 대상 바깥) */}
           {style.transparentBg && (

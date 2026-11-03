@@ -52,6 +52,10 @@ const styles = StyleSheet.create({
   content: {
     padding: spacing.lg,
     gap: spacing.lg,
+    // iPad/Mac 넓은 창에서 목록이 지나치게 늘어나지 않도록
+    width: "100%",
+    maxWidth: 640,
+    alignSelf: "center",
   },
   infoRow: {
     flexDirection: "row",

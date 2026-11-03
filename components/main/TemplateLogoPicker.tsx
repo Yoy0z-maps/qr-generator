@@ -3,6 +3,7 @@ import Card from "@/components/ui/Card";
 import { TEMPLATE_LOGOS } from "@/constants/logos";
 import { colors, radius, spacing } from "@/constants/theme";
 import { useQREditor } from "@/context/QREditorContext";
+import { useLayoutMode } from "@/hooks/useLayoutMode";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import React from "react";
@@ -64,6 +65,7 @@ function LogoTile({
 export default function TemplateLogoPicker() {
   const { t } = useTranslation();
   const { logo, setLogo } = useQREditor();
+  const { isRegular } = useLayoutMode();
 
   async function pickCustomLogo() {
     try {
@@ -85,44 +87,55 @@ export default function TemplateLogoPicker() {
   const customSource: ImageSourcePropType | undefined =
     logo?.type === "custom" ? { uri: logo.uri } : undefined;
 
+  const tiles = (
+    <>
+      <LogoTile
+        selected={logo === null}
+        onPress={() => setLogo(null)}
+        label={t("index.noLogo")}
+      >
+        <Ionicons name="ban-outline" size={26} color={colors.textTertiary} />
+      </LogoTile>
+
+      <LogoTile
+        selected={customSelected}
+        onPress={pickCustomLogo}
+        label={t("index.selectMyLogo")}
+      >
+        {customSource ? (
+          <Image source={customSource} style={styles.logoImage} />
+        ) : (
+          <Ionicons name="add" size={28} color={colors.primary} />
+        )}
+      </LogoTile>
+
+      {TEMPLATE_LOGOS.map((item) => (
+        <LogoTile
+          key={item.id}
+          selected={logo?.type === "template" && logo.id === item.id}
+          onPress={() => setLogo({ type: "template", id: item.id })}
+          accessibilityLabel={item.id}
+        >
+          <Image source={item.source} style={styles.logoImage} />
+        </LogoTile>
+      ))}
+    </>
+  );
+
   return (
     <Card title={t("index.section.logo")} icon="image-outline">
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.list}
-      >
-        <LogoTile
-          selected={logo === null}
-          onPress={() => setLogo(null)}
-          label={t("index.noLogo")}
+      {isRegular ? (
+        // 넓은 창(iPad/Mac): 줄바꿈해서 모든 로고를 한눈에
+        <View style={[styles.list, styles.wrap]}>{tiles}</View>
+      ) : (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.list}
         >
-          <Ionicons name="ban-outline" size={26} color={colors.textTertiary} />
-        </LogoTile>
-
-        <LogoTile
-          selected={customSelected}
-          onPress={pickCustomLogo}
-          label={t("index.selectMyLogo")}
-        >
-          {customSource ? (
-            <Image source={customSource} style={styles.logoImage} />
-          ) : (
-            <Ionicons name="add" size={28} color={colors.primary} />
-          )}
-        </LogoTile>
-
-        {TEMPLATE_LOGOS.map((item) => (
-          <LogoTile
-            key={item.id}
-            selected={logo?.type === "template" && logo.id === item.id}
-            onPress={() => setLogo({ type: "template", id: item.id })}
-            accessibilityLabel={item.id}
-          >
-            <Image source={item.source} style={styles.logoImage} />
-          </LogoTile>
-        ))}
-      </ScrollView>
+          {tiles}
+        </ScrollView>
+      )}
     </Card>
   );
 }
@@ -131,6 +144,11 @@ const styles = StyleSheet.create({
   list: {
     gap: spacing.md,
     paddingRight: spacing.xs,
+  },
+  wrap: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    rowGap: spacing.md,
   },
   tileWrapper: {
     alignItems: "center",

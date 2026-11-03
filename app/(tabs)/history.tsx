@@ -6,6 +6,11 @@ import { PREVIEW_PROTECTION_ENABLED } from "@/constants/ads";
 import { colors, radius, spacing } from "@/constants/theme";
 import { useHistory } from "@/context/HistoryContext";
 import { useQREditor } from "@/context/QREditorContext";
+import {
+  BREAKPOINTS,
+  MAX_CONTENT_WIDTH,
+  useLayoutMode,
+} from "@/hooks/useLayoutMode";
 import { HistoryEntry } from "@/types/qr";
 import { getLogoSource } from "@/utils/logo";
 import { summarizeForm } from "@/utils/qrPayload";
@@ -124,6 +129,14 @@ export default function History() {
   const { entries, toggleFavorite, remove, clearRecent } = useHistory();
   const { loadEntry } = useQREditor();
   const [filter, setFilter] = useState<"all" | "favorites">("all");
+  const { width } = useLayoutMode();
+
+  // 넓은 창(iPad/Mac)에서는 카드 그리드로 표시
+  const numColumns =
+    width >= BREAKPOINTS.wide ? 3 : width >= BREAKPOINTS.regular ? 2 : 1;
+  const contentWidth = Math.min(width, MAX_CONTENT_WIDTH) - spacing.lg * 2;
+  const itemWidth =
+    (contentWidth - spacing.md * (numColumns - 1)) / numColumns;
 
   const data =
     filter === "favorites" ? entries.filter((e) => e.favorite) : entries;
@@ -138,8 +151,9 @@ export default function History() {
 
   return (
     <View style={styles.screen}>
-      <View style={styles.toolbar}>
-        <View style={styles.flex}>
+      <View style={[styles.toolbar, styles.contentWidth]}>
+        {/* 넓은 창에서는 필터가 화면 끝까지 늘어나지 않도록 너비 제한 */}
+        <View style={[styles.flex, numColumns > 1 && styles.filterRegular]}>
           <SegmentedControl
             options={[
               { value: "all", label: t("history.all"), icon: "time-outline" },
@@ -163,19 +177,26 @@ export default function History() {
       </View>
 
       <FlatList
+        // numColumns는 렌더 중 바뀔 수 없어서 열 수가 바뀌면 다시 마운트
+        key={`cols-${numColumns}`}
+        numColumns={numColumns}
+        columnWrapperStyle={numColumns > 1 ? styles.columnWrapper : undefined}
         data={data}
         keyExtractor={(e) => e.id}
+        style={styles.contentWidth}
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
-          <HistoryItem
-            entry={item}
-            onOpen={() => {
-              loadEntry(item);
-              router.navigate("/");
-            }}
-            onToggleFavorite={() => toggleFavorite(item.id)}
-            onDelete={() => remove(item.id)}
-          />
+          <View style={numColumns > 1 ? { width: itemWidth } : undefined}>
+            <HistoryItem
+              entry={item}
+              onOpen={() => {
+                loadEntry(item);
+                router.navigate("/");
+              }}
+              onToggleFavorite={() => toggleFavorite(item.id)}
+              onDelete={() => remove(item.id)}
+            />
+          </View>
         )}
         ListEmptyComponent={
           <View style={styles.empty}>
@@ -200,6 +221,18 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: colors.background,
+  },
+  contentWidth: {
+    width: "100%",
+    maxWidth: MAX_CONTENT_WIDTH,
+    alignSelf: "center",
+  },
+  filterRegular: {
+    maxWidth: 360,
+    marginRight: "auto",
+  },
+  columnWrapper: {
+    gap: spacing.md,
   },
   toolbar: {
     flexDirection: "row",

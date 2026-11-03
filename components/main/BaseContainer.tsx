@@ -2,7 +2,14 @@ import { colors, radius, spacing } from "@/constants/theme";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
+import {
+  Modal,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import Animated, {
   SharedValue,
   useAnimatedStyle,
@@ -42,6 +49,8 @@ export default function BaseContainer({
         onRequestClose={() => setShowModal(false)}
         visible={showModal}
         animationType="slide"
+        // iOS 시트: iPad/Mac에서는 화면 가운데 카드(폼 시트), iPhone에서는 카드형 시트 (아래로 밀어 닫기 지원)
+        presentationStyle={Platform.OS === "ios" ? "formSheet" : undefined}
       >
         <Animated.View style={[styles.wrapper, backgroundColorStyle]}>
           <SafeAreaView style={styles.safeArea}>

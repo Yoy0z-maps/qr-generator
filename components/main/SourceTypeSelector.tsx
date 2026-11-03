@@ -1,9 +1,10 @@
 import { colors, radius, spacing } from "@/constants/theme";
+import { useLayoutMode } from "@/hooks/useLayoutMode";
 import { SOURCE_MODES, SourceMode } from "@/types/qr";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Pressable, ScrollView, StyleSheet, Text } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 export const SOURCE_MODE_ICONS: Record<
   SourceMode,
@@ -25,14 +26,9 @@ type Props = {
 
 export default function SourceTypeSelector({ mode, setMode }: Props) {
   const { t } = useTranslation();
+  const { isRegular } = useLayoutMode();
 
-  return (
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      contentContainerStyle={styles.container}
-    >
-      {SOURCE_MODES.map((m) => {
+  const chips = SOURCE_MODES.map((m) => {
         const selected = m === mode;
         return (
           <Pressable
@@ -52,7 +48,19 @@ export default function SourceTypeSelector({ mode, setMode }: Props) {
             </Text>
           </Pressable>
         );
-      })}
+      });
+
+  // 넓은 창(iPad/Mac)에서는 모든 유형이 한눈에 보이도록 줄바꿈, 좁은 창에서는 가로 스크롤
+  if (isRegular) {
+    return <View style={[styles.container, styles.wrap]}>{chips}</View>;
+  }
+  return (
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={styles.container}
+    >
+      {chips}
     </ScrollView>
   );
 }
@@ -61,6 +69,10 @@ const styles = StyleSheet.create({
   container: {
     gap: spacing.sm,
     paddingRight: spacing.xs,
+  },
+  wrap: {
+    flexDirection: "row",
+    flexWrap: "wrap",
   },
   chip: {
     flexDirection: "row",
