@@ -1,0 +1,6 @@
+{
+  "ios": {
+    "NSPhotoLibraryUsageDescription": "QRコードに入れるロゴ画像を選んだり、作成したQRコードを写真ライブラリの「QR Codes」アルバムに保存したりするために、写真へのアクセスが必要です。",
+    "NSPhotoLibraryAddUsageDescription": "作成したQRコード画像を写真ライブラリに保存するために、アクセスが必要です。"
+  }
+}

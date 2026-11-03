@@ -8,40 +8,56 @@ import ColorPicker, {
   InputWidget,
   OpacitySlider,
   Panel2,
-  colorKit,
 } from "reanimated-color-picker";
 
 import { colorPickerStyle } from "@/styles/colorPickerStyle";
-import { useTranslation } from "react-i18next";
-import BaseContainer from "./BaseContainer";
+import BaseContainer, { StyleTile } from "./BaseContainer";
 import Divider from "./Divider";
 
-// initial random color
-const initialColor = colorKit.randomRgbColor().hex();
-
+/** 단색 선택 타일 + 컬러 피커 모달 (코드 색 / 배경색 공용) */
 export default function ColorPickerComponent({
+  label,
   color,
   setColor,
+  active,
+  swatch,
+  children,
 }: {
+  label: string;
   color: string;
   setColor: (color: string) => void;
+  active?: boolean;
+  /** 타일 견본 (기본: 선택된 색) */
+  swatch?: React.ReactNode;
+  /** 컬러 피커 위에 추가로 표시할 내용 */
+  children?: React.ReactNode;
 }) {
-  const currentColor = useSharedValue(initialColor);
-  const { t } = useTranslation();
+  // 모달 배경색: 무작위 색이 아니라 현재 선택된 색에서 시작
+  const currentColor = useSharedValue(color);
+
   // runs on the ui thread on color change
-  const onColorChange = (color: ColorFormatsObject) => {
+  const onColorChange = (c: ColorFormatsObject) => {
     "worklet";
-    currentColor.value = color.hex;
+    currentColor.value = c.hex;
   };
 
-  const onColorPick = (color: ColorFormatsObject) => {
-    setColor(color.hex);
+  const onColorPick = (c: ColorFormatsObject) => {
+    setColor(c.hex);
   };
 
   return (
-    <BaseContainer name={t("index.solid")} backgroundColor={currentColor}>
+    <BaseContainer
+      title={label}
+      backgroundColor={currentColor}
+      trigger={(open) => (
+        <StyleTile label={label} active={active} onPress={open}>
+          {swatch ?? <View style={{ flex: 1, backgroundColor: color }} />}
+        </StyleTile>
+      )}
+    >
       <KeyboardAvoidingView behavior="position">
         <View style={colorPickerStyle.pickerContainer}>
+          {children}
           <ColorPicker
             value={color}
             sliderThickness={25}

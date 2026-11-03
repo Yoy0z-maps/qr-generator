@@ -1,19 +1,15 @@
-import ColorPickerComponent from "@/components/main/ColorPickerComponent";
-import GradientPickerComponent from "@/components/main/GradientPickerComponent";
 import QRPreview from "@/components/main/QRPreview";
 import ResetButton from "@/components/main/ResetButton";
 import SourcePicker from "@/components/main/SourcePicker";
-import { Gradient } from "@/types/gradient";
-import { useState } from "react";
+import StyleSection from "@/components/main/StyleSection";
+import TemplateLogoPicker from "@/components/main/TemplateLogoPicker";
+import { colors, spacing } from "@/constants/theme";
+import { useQREditor } from "@/context/QREditorContext";
 import { useTranslation } from "react-i18next";
-import { Alert, ScrollView, View } from "react-native";
+import { Alert, ScrollView, StyleSheet } from "react-native";
 
 export default function Home() {
-  const [value, setValue] = useState("");
-  const [fgColor, setFgColor] = useState("#000000");
-  const [gradient, setGradient] = useState<Gradient | null>(null);
-  const [logoUri, setLogoUri] = useState<string | undefined>(undefined);
-  const [resetTrigger, setResetTrigger] = useState<number>(0); // 초기화 트리거
+  const { reset } = useQREditor();
   const { t } = useTranslation();
 
   const handleReset = () => {
@@ -25,31 +21,35 @@ export default function Home() {
       {
         text: t("index.reset"),
         style: "destructive",
-        onPress: () => {
-          setValue("");
-          setFgColor("#000000");
-          setGradient(null);
-          setLogoUri(undefined);
-          setResetTrigger((prev) => prev + 1); // 초기화 트리거 증가
-        },
+        onPress: reset,
       },
     ]);
   };
 
   return (
-    <ScrollView>
-      <SourcePicker onChangeValue={setValue} resetTrigger={resetTrigger} />
-      <ColorPickerComponent color={fgColor} setColor={setFgColor} />
-      <View style={{ height: 12 }} />
-      <GradientPickerComponent gradient={gradient} setGradient={setGradient} />
+    <ScrollView
+      style={styles.screen}
+      contentContainerStyle={styles.content}
+      keyboardShouldPersistTaps="handled"
+      keyboardDismissMode="on-drag"
+      automaticallyAdjustKeyboardInsets
+    >
+      <SourcePicker />
+      <QRPreview />
+      <StyleSection />
+      <TemplateLogoPicker />
       <ResetButton handleReset={handleReset} />
-      <QRPreview
-        value={value}
-        fgColor={fgColor}
-        gradient={gradient}
-        logoUri={logoUri}
-        setLogoUri={setLogoUri}
-      />
     </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  content: {
+    padding: spacing.lg,
+    gap: spacing.lg,
+  },
+});
