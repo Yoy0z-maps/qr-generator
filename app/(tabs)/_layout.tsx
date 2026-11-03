@@ -1,6 +1,6 @@
 import TabBarIcon from "@/components/layout/TabBarIcon";
 import TabBarLabel from "@/components/layout/TabBarLabel";
-import { DefaultTheme } from "@react-navigation/native";
+import { colors } from "@/constants/theme";
 import { Tabs } from "expo-router";
 import React from "react";
 import { useTranslation } from "react-i18next";
@@ -12,7 +12,8 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: DefaultTheme.colors.primary,
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.textTertiary,
         headerShown: false,
         tabBarStyle: Platform.select({
           ios: {
@@ -27,8 +28,22 @@ export default function TabLayout() {
           tabBarLabel: ({ color }) => (
             <TabBarLabel label={t("index.title")} color={color} />
           ),
-          tabBarIcon: ({ color }) => (
-            <TabBarIcon name="qr-code" color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon
+              name={focused ? "qr-code" : "qr-code-outline"}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="history"
+        options={{
+          tabBarLabel: ({ color }) => (
+            <TabBarLabel label={t("history.title")} color={color} />
+          ),
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? "time" : "time-outline"} color={color} />
           ),
         }}
       />
@@ -38,8 +53,11 @@ export default function TabLayout() {
           tabBarLabel: ({ color }) => (
             <TabBarLabel label={t("settings.title")} color={color} />
           ),
-          tabBarIcon: ({ color }) => (
-            <TabBarIcon name="settings" color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon
+              name={focused ? "settings" : "settings-outline"}
+              color={color}
+            />
           ),
         }}
       />

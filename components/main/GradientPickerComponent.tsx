@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -8,13 +9,7 @@ import {
   View,
 } from "react-native";
 import { useSharedValue } from "react-native-reanimated";
-import Svg, {
-  Defs,
-  LinearGradient,
-  RadialGradient,
-  Rect,
-  Stop,
-} from "react-native-svg";
+import Svg, { Defs, Rect } from "react-native-svg";
 
 import type { ColorFormatsObject } from "reanimated-color-picker";
 import ColorPicker, {
@@ -24,17 +19,31 @@ import ColorPicker, {
   Panel2,
 } from "reanimated-color-picker";
 
+import { colors, radius, spacing } from "@/constants/theme";
 import { colorPickerStyle } from "@/styles/colorPickerStyle";
 import { Gradient, GRADIENT_PRESETS } from "@/types/gradient";
-import BaseContainer from "./BaseContainer";
+import BaseContainer, { StyleTile } from "./BaseContainer";
 import Divider from "./Divider";
+import GradientDef, { gradientId } from "./GradientDef";
 
 interface GradientPickerComponentProps {
   gradient: Gradient | null;
   setGradient: (gradient: Gradient | null) => void;
 }
 
-const GRADIENT_PREVIEW_SIZE = 60;
+const GRADIENT_PREVIEW_SIZE = 56;
+
+function GradientSwatch({ gradient, size }: { gradient: Gradient; size: number }) {
+  const id = gradientId(gradient);
+  return (
+    <Svg width={size} height={size}>
+      <Defs>
+        <GradientDef id={id} gradient={gradient} />
+      </Defs>
+      <Rect width="100%" height="100%" fill={`url(#${id})`} />
+    </Svg>
+  );
+}
 
 export default function GradientPickerComponent({
   gradient,
@@ -43,13 +52,6 @@ export default function GradientPickerComponent({
   const [editingStopIndex, setEditingStopIndex] = useState(0);
   const { t } = useTranslation();
 
-  const currentColor = useSharedValue("#000000");
-
-  const onColorChange = (color: ColorFormatsObject) => {
-    "worklet";
-    currentColor.value = color.hex;
-  };
-
   const onColorPick = (color: ColorFormatsObject) => {
     if (gradient && editingStopIndex >= 0) {
       const newStops = [...gradient.stops];
@@ -57,162 +59,110 @@ export default function GradientPickerComponent({
         ...newStops[editingStopIndex],
         color: color.hex,
       };
-
-      const newGradient: Gradient = {
-        ...gradient,
-        stops: newStops,
-      };
-
-      setGradient(newGradient);
+      setGradient({ ...gradient, stops: newStops });
     }
   };
 
-  const handlePresetSelect = (preset: Gradient) => {
-    setGradient(preset);
-  };
-
-  const renderGradientPreview = (
-    grad: Gradient,
-    size: number = GRADIENT_PREVIEW_SIZE
-  ) => {
-    return (
-      <Svg width={size} height={size} style={{ borderRadius: 8 }}>
-        <Defs>
-          {grad.type === "linear" ? (
-            <LinearGradient
-              id={`linear-${grad.direction}`}
-              x1={grad.direction.includes("left") ? "100%" : "0%"}
-              y1={grad.direction.includes("top") ? "100%" : "0%"}
-              x2={grad.direction.includes("right") ? "100%" : "0%"}
-              y2={grad.direction.includes("bottom") ? "100%" : "0%"}
-            >
-              {grad.stops.map((stop, index) => (
-                <Stop
-                  key={index}
-                  offset={`${stop.offset}%`}
-                  stopColor={stop.color}
-                />
-              ))}
-            </LinearGradient>
-          ) : (
-            <RadialGradient
-              id={`radial-${grad.centerX}-${grad.centerY}`}
-              cx={`${grad.centerX}%`}
-              cy={`${grad.centerY}%`}
-              r={`${grad.radius}%`}
-            >
-              {grad.stops.map((stop, index) => (
-                <Stop
-                  key={index}
-                  offset={`${stop.offset}%`}
-                  stopColor={stop.color}
-                />
-              ))}
-            </RadialGradient>
-          )}
-        </Defs>
-        <Rect
-          width="100%"
-          height="100%"
-          fill={`url(#${
-            grad.type === "linear"
-              ? `linear-${grad.direction}`
-              : `radial-${grad.centerX}-${grad.centerY}`
-          })`}
-        />
-      </Svg>
-    );
-  };
-
-  const backgroundColor = useSharedValue<string>("#f0f0f0");
+  const backgroundColor = useSharedValue<string>(colors.background);
 
   return (
-    <BaseContainer name={t("index.gradient")} backgroundColor={backgroundColor}>
-      <ScrollView style={styles.container}>
-        {/* Gradient Type Selection with Preview */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Gradient Preview</Text>
-          {/* Preview integrated with type selection */}
-          {gradient && (
-            <View style={styles.previewContainer}>
-              {renderGradientPreview(gradient, 120)}
-            </View>
-          )}
-        </View>
-
+    <BaseContainer
+      title={t("index.gradient")}
+      backgroundColor={backgroundColor}
+      trigger={(open) => (
+        <StyleTile label={t("index.gradient")} active={!!gradient} onPress={open}>
+          <GradientSwatch gradient={gradient ?? GRADIENT_PRESETS[1]} size={36} />
+        </StyleTile>
+      )}
+    >
+      <ScrollView contentContainerStyle={styles.container}>
         {/* Gradient Presets */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Presets</Text>
+          <Text style={styles.sectionTitle}>{t("index.presets")}</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View style={styles.presetsContainer}>
-              {GRADIENT_PRESETS.map((preset, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={styles.presetItem}
-                  onPress={() => handlePresetSelect(preset)}
-                >
-                  {renderGradientPreview(preset)}
-                </TouchableOpacity>
-              ))}
+              {GRADIENT_PRESETS.map((preset, index) => {
+                const selected =
+                  !!gradient &&
+                  JSON.stringify(gradient) === JSON.stringify(preset);
+                return (
+                  <TouchableOpacity
+                    key={index}
+                    style={[styles.presetItem, selected && styles.presetSelected]}
+                    onPress={() => {
+                      setGradient(preset);
+                      setEditingStopIndex(0);
+                    }}
+                  >
+                    <GradientSwatch gradient={preset} size={GRADIENT_PREVIEW_SIZE} />
+                  </TouchableOpacity>
+                );
+              })}
             </View>
           </ScrollView>
         </View>
 
-        {/* Color Stops - only show when gradient exists */}
-        {gradient && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Color Stops</Text>
-            {gradient.stops.map((stop, index) => (
-              <TouchableOpacity
-                key={index}
-                style={[
-                  styles.stopRow,
-                  editingStopIndex === index && styles.activeStopRow,
-                ]}
-                onPress={() => setEditingStopIndex(index)}
-              >
-                <View style={styles.stopPreview}>
-                  <View
-                    style={[styles.stopColor, { backgroundColor: stop.color }]}
-                  />
+        {gradient ? (
+          <>
+            {/* Current gradient + color stops */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>{t("index.colorStops")}</Text>
+              <View style={styles.previewRow}>
+                <View style={styles.previewBox}>
+                  <GradientSwatch gradient={gradient} size={88} />
                 </View>
-                <Text style={styles.stopText}>
-                  {stop.color} ({stop.offset}%)
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        )}
+                <View style={styles.stops}>
+                  {gradient.stops.map((stop, index) => (
+                    <Pressable
+                      key={index}
+                      style={[
+                        styles.stopRow,
+                        editingStopIndex === index && styles.activeStopRow,
+                      ]}
+                      onPress={() => setEditingStopIndex(index)}
+                    >
+                      <View
+                        style={[styles.stopColor, { backgroundColor: stop.color }]}
+                      />
+                      <Text style={styles.stopText}>
+                        {stop.color.toUpperCase()} · {stop.offset}%
+                      </Text>
+                    </Pressable>
+                  ))}
+                </View>
+              </View>
+            </View>
 
-        {/* Color Picker for Selected Stop - only show when gradient exists */}
-        {gradient && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>
-              Edit Stop {editingStopIndex + 1}
-            </Text>
-            <ColorPicker
-              value={gradient.stops[editingStopIndex]?.color || "#000000"}
-              sliderThickness={25}
-              thumbSize={30}
-              thumbShape="rect"
-              onChange={onColorChange}
-              onCompleteJS={onColorPick}
-              style={colorPickerStyle.picker}
-            >
-              <Panel2
-                style={colorPickerStyle.panelStyle}
-                thumbShape="ring"
-                reverseVerticalChannel
-              />
-              <BrightnessSlider style={colorPickerStyle.sliderStyle} />
-              <OpacitySlider style={colorPickerStyle.sliderStyle} />
-              <Divider />
-              <InputWidget
-                inputStyle={colorPickerStyle.inputStyle}
-                iconColor="#707070"
-              />
-            </ColorPicker>
-          </View>
+            {/* Color Picker for Selected Stop */}
+            <View style={[styles.section, styles.pickerCard]}>
+              <Text style={styles.sectionTitle}>
+                {t("index.editStop", { index: editingStopIndex + 1 })}
+              </Text>
+              <ColorPicker
+                value={gradient.stops[editingStopIndex]?.color || "#000000"}
+                sliderThickness={25}
+                thumbSize={30}
+                thumbShape="rect"
+                onCompleteJS={onColorPick}
+                style={colorPickerStyle.picker}
+              >
+                <Panel2
+                  style={colorPickerStyle.panelStyle}
+                  thumbShape="ring"
+                  reverseVerticalChannel
+                />
+                <BrightnessSlider style={colorPickerStyle.sliderStyle} />
+                <OpacitySlider style={colorPickerStyle.sliderStyle} />
+                <Divider />
+                <InputWidget
+                  inputStyle={colorPickerStyle.inputStyle}
+                  iconColor="#707070"
+                />
+              </ColorPicker>
+            </View>
+          </>
+        ) : (
+          <Text style={styles.hint}>{t("index.gradientHint")}</Text>
         )}
       </ScrollView>
     </BaseContainer>
@@ -221,130 +171,81 @@ export default function GradientPickerComponent({
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 100,
-    paddingHorizontal: 12,
+    paddingTop: spacing.xl,
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.xl,
+    gap: spacing.lg,
   },
   section: {
-    marginBottom: 20,
+    gap: spacing.sm,
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 10,
-    color: "#333",
-  },
-  currentGradientContainer: {
-    marginBottom: 20,
-  },
-  currentGradientPreview: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-  },
-  removeButton: {
-    backgroundColor: "#ff4444",
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  removeButtonText: {
-    color: "white",
-    fontSize: 12,
-    fontWeight: "bold",
+    fontSize: 15,
+    fontWeight: "700",
+    color: colors.text,
   },
   presetsContainer: {
     flexDirection: "row",
-    gap: 12,
+    gap: spacing.md,
   },
   presetItem: {
     borderWidth: 2,
-    borderColor: "#ddd",
-    borderRadius: 8,
+    borderColor: "transparent",
+    borderRadius: radius.md,
     padding: 2,
+    overflow: "hidden",
   },
-  customizeContainer: {
-    paddingTop: 100,
-    paddingHorizontal: 12,
+  presetSelected: {
+    borderColor: colors.primary,
   },
-  buttonRow: {
+  previewRow: {
     flexDirection: "row",
-    gap: 10,
+    alignItems: "center",
+    gap: spacing.md,
   },
-  typeButton: {
+  previewBox: {
+    borderRadius: radius.md,
+    overflow: "hidden",
+  },
+  stops: {
     flex: 1,
-    padding: 12,
-    backgroundColor: "#f0f0f0",
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  activeButton: {
-    backgroundColor: "#007AFF",
-  },
-  buttonText: {
-    fontSize: 14,
-    fontWeight: "500",
-    color: "#333",
-  },
-  previewContainer: {
-    alignItems: "center",
-    padding: 20,
+    gap: spacing.sm,
   },
   stopRow: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 12,
-    backgroundColor: "#f9f9f9",
-    borderRadius: 8,
-    marginBottom: 8,
+    gap: spacing.sm,
+    padding: spacing.md,
+    backgroundColor: colors.card,
+    borderRadius: radius.md,
+    borderWidth: 1.5,
+    borderColor: colors.border,
   },
   activeStopRow: {
-    backgroundColor: "#e3f2fd",
-    borderWidth: 2,
-    borderColor: "#2196f3",
-  },
-  stopPreview: {
-    marginRight: 12,
+    backgroundColor: colors.primarySoft,
+    borderColor: colors.primary,
   },
   stopColor: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: "rgba(0,0,0,0.1)",
   },
   stopText: {
     flex: 1,
     fontSize: 14,
-    color: "#333",
+    color: colors.text,
+    fontVariant: ["tabular-nums"],
   },
-  actionButtons: {
-    flexDirection: "row",
-    gap: 12,
-    marginTop: 20,
+  pickerCard: {
+    backgroundColor: colors.card,
+    borderRadius: radius.lg,
+    padding: spacing.lg,
   },
-  actionButton: {
-    flex: 1,
-    padding: 12,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  applyButton: {
-    backgroundColor: "#4CAF50",
-  },
-  cancelButton: {
-    backgroundColor: "#757575",
-  },
-  customizeButton: {
-    backgroundColor: "#007AFF",
-  },
-  actionButtonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  disabledButtonText: {
-    color: "#999",
+  hint: {
+    textAlign: "center",
+    color: colors.textSecondary,
+    fontSize: 14,
   },
 });

@@ -1,41 +1,62 @@
-import { changeLanguage } from "@/app/i18n/i18n";
+import { colors, spacing } from "@/constants/theme";
+import { changeLanguage } from "@/i18n/i18n";
+import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
-import { Text, TouchableOpacity } from "react-native";
+import { Pressable, StyleSheet, Text } from "react-native";
 
+/** 설정 화면의 언어 선택 행 */
 export default function LanguageButton({
   langCode,
   labelKey,
   isSelected,
+  isLast,
 }: {
   langCode: string;
   labelKey: string;
   isSelected: boolean;
+  isLast?: boolean;
 }) {
   const { t } = useTranslation();
 
   return (
-    <TouchableOpacity
-      style={{
-        width: "48%",
-        alignItems: "center",
-        justifyContent: "center",
-        borderColor: isSelected ? "skyblue" : "lightgray",
-        borderWidth: 1,
-        borderRadius: 10,
-        paddingVertical: 12,
-        backgroundColor: "white",
-      }}
+    <Pressable
+      accessibilityRole="radio"
+      accessibilityState={{ selected: isSelected }}
       onPress={() => changeLanguage(langCode)}
+      style={({ pressed }) => [
+        styles.row,
+        !isLast && styles.divider,
+        pressed && { backgroundColor: colors.inputBackground },
+      ]}
     >
-      <Text
-        style={{
-          color: isSelected ? "skyblue" : "lightgray",
-          fontSize: 16,
-          fontWeight: isSelected ? "bold" : "normal",
-        }}
-      >
+      <Text style={[styles.label, isSelected && styles.labelSelected]}>
         {t(labelKey)}
       </Text>
-    </TouchableOpacity>
+      {isSelected && (
+        <Ionicons name="checkmark" size={20} color={colors.primary} />
+      )}
+    </Pressable>
   );
 }
+
+const styles = StyleSheet.create({
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 14,
+    paddingHorizontal: spacing.xs,
+  },
+  divider: {
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.border,
+  },
+  label: {
+    fontSize: 16,
+    color: colors.text,
+  },
+  labelSelected: {
+    color: colors.primary,
+    fontWeight: "600",
+  },
+});

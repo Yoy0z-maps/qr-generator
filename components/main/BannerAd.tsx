@@ -15,7 +15,8 @@ const BANNER_AD_UNIT_ID = __DEV__
 
 export default function BannerHeader() {
   return (
-    <SafeAreaView style={{ alignItems: "center" }}>
+    // 헤더이므로 상단 안전 영역만 적용 (하단까지 적용하면 배너 아래에 홈 인디케이터 높이만큼 빈 공간이 생김)
+    <SafeAreaView edges={["top"]} style={{ alignItems: "center" }}>
       <BannerAd
         unitId={BANNER_AD_UNIT_ID}
         size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER} // SMART_BANNER, LARGE_BANNER, MEDIUM_RECTANGLE 등 가능

@@ -1,34 +1,19 @@
-import { t } from "i18next";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import AppButton from "@/components/ui/AppButton";
+import { useTranslation } from "react-i18next";
 
 export default function ResetButton({
   handleReset,
 }: {
   handleReset: () => void;
 }) {
+  const { t } = useTranslation();
+
   return (
-    <View style={styles.resetContainer}>
-      <TouchableOpacity style={styles.resetButton} onPress={handleReset}>
-        <Text style={styles.resetButtonText}>{t("index.resetAll")}</Text>
-      </TouchableOpacity>
-    </View>
+    <AppButton
+      title={t("index.resetAll")}
+      icon="refresh"
+      variant="danger"
+      onPress={handleReset}
+    />
   );
 }
-
-const styles = StyleSheet.create({
-  resetContainer: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-  },
-  resetButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  resetButtonText: {
-    color: "#F84244",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-});
