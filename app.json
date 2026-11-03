@@ -2,13 +2,14 @@
   "expo": {
     "name": "qr-generator",
     "slug": "qr-generator",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/images/logo.png",
     "scheme": "qrgenerator",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "ios": {
+      "buildNumber": "4",
       "supportsTablet": true,
       "bundleIdentifier": "com.yoy0zmaps.qrgenerator"
     },
