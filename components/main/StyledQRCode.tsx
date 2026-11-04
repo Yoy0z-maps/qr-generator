@@ -1,6 +1,6 @@
 import React, { Ref, useMemo } from "react";
 import { ImageSourcePropType } from "react-native";
-import Svg, { Defs, Image as SvgImage, Path, Rect } from "react-native-svg";
+import Svg, { Defs, G, Image as SvgImage, Path, Rect } from "react-native-svg";
 
 import { QRStyle } from "@/types/qr";
 import { QRMatrix } from "@/utils/qrMatrix";
@@ -57,35 +57,36 @@ export default function StyledQRCode({
   );
 
   const gradientId = gradient ? getGradientId(gradient) : "";
+  // 모듈 단위 좌표 → 화면 포인트
+  const scale = size / extent;
   const inset = logoBox ? logoBox.size * LOGO_INSET_RATIO : 0;
 
+  // viewBox를 화면 포인트 단위로 두고 QR path만 모듈 단위에서 확대한다.
+  // New Architecture(iOS)에서 react-native-svg <Image>의 width/height가 레이아웃 크기로도 쓰여
+  // 그 크기(포인트 × 화면 배율)로 이미지를 축소 디코딩하므로, 모듈 단위(약 5~15)를 그대로 넘기면
+  // 로고가 수십 px로 디코딩된 뒤 확대되어 심하게 깨진다. 실제 표시 크기를 넘겨야 선명하다.
   return (
-    <Svg
-      ref={svgRef}
-      width={size}
-      height={size}
-      viewBox={`0 0 ${extent} ${extent}`}
-    >
+    <Svg ref={svgRef} width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
       {gradient && (
         <Defs>
           <GradientDef id={gradientId} gradient={gradient} />
         </Defs>
       )}
 
-      {!transparentBg && (
-        <Rect width={extent} height={extent} fill={bgColor} />
-      )}
+      {!transparentBg && <Rect width={size} height={size} fill={bgColor} />}
 
       {/* 그라디언트는 QR 영역(path의 bounding box) 기준으로 펼쳐진다 */}
-      <Path d={qrPath} fill={gradient ? `url(#${gradientId})` : fgColor} />
+      <G transform={`scale(${scale})`}>
+        <Path d={qrPath} fill={gradient ? `url(#${gradientId})` : fgColor} />
+      </G>
 
       {logo && logoBox && (
         <SvgImage
           href={logo}
-          x={logoBox.x + inset}
-          y={logoBox.y + inset}
-          width={logoBox.size - inset * 2}
-          height={logoBox.size - inset * 2}
+          x={(logoBox.x + inset) * scale}
+          y={(logoBox.y + inset) * scale}
+          width={(logoBox.size - inset * 2) * scale}
+          height={(logoBox.size - inset * 2) * scale}
           preserveAspectRatio="xMidYMid meet"
           onLoad={onLogoLoad}
         />
